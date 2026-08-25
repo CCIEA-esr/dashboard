@@ -1,0 +1,261 @@
+---
+format:
+  html:
+    page-layout: full
+    toc: false
+    css: lib/dygraph/dygraph.min.css
+    include-in-header:
+      text: |
+        <script src="lib/dygraph/dygraph.min.js"></script>
+---
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(jsonlite)
+library(dplyr)
+library(purrr)
+
+# 1. Read JSON file
+json_data <- jsonlite::fromJSON("data/items_dashboard.json", simplifyVector = FALSE)
+
+ojs_groups <- lapply(seq_along(json_data$items), function(i) {
+  group <- json_data$items[[i]]
+  raw_data <- group$data
+  
+  df_list <- lapply(raw_data, function(row) {
+    as.data.frame(t(as.character(row)), stringsAsFactors = FALSE)
+  })
+  
+  df <- do.call(rbind, df_list)
+  
+  timestamps <- df[[1]]
+  val_df <- df[, -1, drop = FALSE]
+  value_matrix <- do.call(cbind, lapply(val_df, function(col) as.numeric(col)))
+  
+  plot_labels <- if (!is.null(group$options$labels)) group$options$labels[-1] else group$titles
+  checkbox_titles <- if (!is.null(group$titles)) group$titles else plot_labels
+  
+  # Extract axis mapping configuration from options$series
+  series_opts <- list()
+  if (!is.null(group$options$series)) {
+    series_opts <- group$options$series
+  }
+  
+  list(
+    index = i,                      # 1-based index (1, 2, 3, ...)
+    index_zero = i - 1,             # 0-based index for JavaScript (0, 1, 2, ...)
+    group_id = paste0("group_", i), # String ID (e.g., "group_1")
+    title = group$title,
+    titles = unlist(checkbox_titles),
+    labels = unlist(plot_labels),
+    colors = unlist(group$options$colors),
+    dsets = unlist(group$options$sets),
+    names = unlist(group$options$names),
+    query = unlist(group$options$query),
+    mint = unlist(group$options$minT),
+    maxt = unlist(group$options$maxT),
+    inst = unlist(group$options$inst),
+    summary = unlist(group$options$summary),
+    visibility = as.logical(unlist(group$options$visibility)),
+    ylabel = group$options$ylabel,
+    y2label = group$options$y2label,
+    series = series_opts,
+    timestamps = timestamps,
+    values = value_matrix,
+    strokewidth = group$options$strokeWidth,
+    pointsize = group$options$pointSize,
+    highlightcirclesize = group$options$highlightCircleSize,
+    datewindow = group$options$dateWindow,
+    xrangepad = group$options$xRangePad,
+    yrangepad = group$options$yRangePad,
+    rightgap = group$options$rightGap
+  )
+})
+# 3. Export all groups to OJS
+ojs_define(allGroups = ojs_groups)
+```
+
+::: {#dashboard-tabset .panel-tabset .ojs-track-layout}
+
+## Dashboard
+
+::::{}
+
+*Jump to:*
+
+* [Large Scale Oceanographic Indicators](index.qmd#grp0)
+* [Upwelling Index - Monthly](index.qmd#grp1)
+* [Upwelling Index - Daily](index.qmd#grp2)
+* [Habitat Compression](index.qmd#grp3)
+* [Marine Heat Wave](index.qmd#grp4)
+
+::::
+
+
+```{ojs}
+//| echo: false
+
+// Load local Dygraphs library
+Dygraph = require(await FileAttachment("lib/dygraph/dygraph.min.js").url())
+
+html`${allGroups.map((group, groupIdx) => {
+  
+  const checkboxInputs = Inputs.checkbox(
+    group.titles, 
+    { 
+      value: group.titles.filter((_, i) => group.visibility[i])
+    }
+  );
+  
+  const indinfo = Inputs.checkbox(
+    group.titles, 
+    { 
+      value: group.titles.filter((_, i) => group.visibility[i])
+    }
+  );
+  
+  const legdivht = 50 + (group.titles.length*30);
+  
+  
+  // Generate dynamic CSS rules to style each checkbox label & input by color
+  const dynamicStyles = html`<style>
+    ${group.colors.map((color, idx) => `
+      /* Scope styles specifically to this group index */
+      .group-cb-${groupIdx} label:nth-child(${idx + 1}) {
+        color: ${color} !important;
+        font-weight: 400;
+        display: block;
+      }
+      .group-cb-${groupIdx} label:nth-child(${idx + 1}) input[type="checkbox"] {
+        accent-color: ${color} !important;
+      }
+    `).join("")}
+    #legdiv_${groupIdx} {height : ${legdivht} px;}
+  </style>`;
+
+  const chartContainer = document.createElement("div");
+  chartContainer.style.width = "100%";
+  chartContainer.style.height = "300px";
+  chartContainer.style.position = "relative";
+  chartContainer.style.marginTop = "10px";
+  chartContainer.style.marginBottom = "40px";
+
+  const chartData = group.timestamps.map((t, rowIdx) => {
+    const row = [new Date(t)];
+    for (let colIdx = 0; colIdx < group.labels.length; colIdx++) {
+      row.push(group.values[rowIdx][colIdx]);
+    }
+    return row;
+  });
+
+  checkboxInputs.addEventListener("input", () => {
+    const selectedTitles = checkboxInputs.value;
+    const currentVisibility = group.titles.map(title => selectedTitles.includes(title));
+  
+    if (chartContainer._dygraphInstance) {
+      chartContainer._dygraphInstance.updateOptions({ visibility: currentVisibility });
+    }
+  });
+
+  requestAnimationFrame(() => {
+    const initialVisibility = group.titles.map(title => checkboxInputs.value.includes(title));
+    
+    chartContainer._dygraphInstance = new Dygraph(chartContainer, chartData, {
+      labels: ["Time", ...group.labels],
+      colors: group.colors,
+      visibility: initialVisibility,
+      ylabel: group.ylabel || "",
+      y2label: group.y2label || "",
+      series: group.series || {},  // Assigns specified series to 'y2' axis
+      legend: "always",
+      hideOverlayOnMouseOut: false,
+      showRangeSelector: true,
+      labelsSeparateLines: true,
+      labelsDiv: "legdiv_"+group.index,
+      strokeWidth: group.strokewidth,
+      pointSize: group.pointsize,
+      highlightCircleSize: group.highlightcirclesize,
+      dateWindow: group.datewindow,
+      xRangePad: group.xrangepad,
+      yRangePad: group.yrangepad,
+      rightGap: group.rightgap
+    });
+
+    setTimeout(() => {
+      chartContainer._dygraphInstance.resize();
+    }, 50);
+  });
+
+  return html`
+    ${dynamicStyles}
+    <div id="grp${groupIdx}" class="custom-container" style="padding: 15px; background: #ffffff; border: 1px solid #e9ecef; border-radius: 6px; margin-bottom: 25px;">
+      <div class="custom-sidebar group-cb-${groupIdx}">
+      <span class="custom-sidebar-title">Choose indicator:</span>
+      ${checkboxInputs}
+      </div>
+      <div class="custom-main">
+      <div><h3>${group.title}</h3></div>
+      <div id="legdiv_${group.index}"></div>
+      ${chartContainer}
+      </div>
+    </div>
+  `;
+})}`
+
+```
+
+
+
+## Indicator Information & Download
+
+
+```{r}
+#| echo: false
+#| results: 'asis'
+
+baseurl = "http://oceanview.pfeg.noaa.gov/erddap/tabledap/"
+
+geturl <- function(dset,fmt,query,baseurl){
+  url=paste0(baseurl,dset,".",fmt, sep="")
+  if(exists(query) && !is.null(query))paste0(url,"?&",query,sep="")
+  return(url)
+}
+
+for (group in json_data$items) {
+  ningr = 0
+  for (i in seq_along(group$titles)) {
+    indtitle <- group$titles[[i]]
+    if(group$title=="Upwelling Index"){
+      if(i>3)break
+      indtitle <- substr(indtitle,1,nchar(indtitle)-5)
+      }
+    if(group$title=="Habitat Compression"){
+      if(i>1)break
+      indtitle <- substr(indtitle,1,nchar(indtitle)-9)
+      }
+    if(group$title=="Upwelling Index - Daily")break
+    ningr=ningr+1
+    if(ningr == 1)cat("### ",group$title, "\n\n",sep="")
+    clean_desc <- gsub("<[^>]+>", "", group$summary[[i]])
+      title = indtitle
+      description = trimws(clean_desc)
+      institution = group$inst[[i]]
+      trange = paste0(substr(group$minT[[i]],1,10)," - ",substr(group$maxT[[i]],1,10),sep="")
+    csv = geturl(group$dsets[[i]],'csv',group$query[[i]],baseurl)
+    html = geturl(group$dsets[[i]],'html',group$query[[i]],baseurl)
+    
+    cat("#### **",title,"**\n",sep="")
+    cat(description,"\n\n",sep="")
+    cat("*Institution*: ",institution,"\n\n",sep="")
+    cat("*Time Range:* ", trange,"\n\n",sep="")
+    cat("*Download:*&nbsp;&nbsp;&nbsp;  [csv file](",csv,")&nbsp;&nbsp;&nbsp;","[Go to ERDDAP&#8482;](", html,")\n\n" ,sep="") 
+   }
+}
+
+```
+
+
+:::
