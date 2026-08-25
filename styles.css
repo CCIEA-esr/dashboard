@@ -1,0 +1,70 @@
+/* css styles */
+
+
+/* Define grid layout for sidebar and main content */
+.custom-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 20px;
+  font-family: sans-serif;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease;
+}
+
+.custom-container:hover {
+  transform: translateY(-4px);
+}
+
+/* Sidebar styling */
+.custom-sidebar {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-size: .9rem;
+}
+
+/* Main panel styling */
+.custom-main {
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+/* Style the custom header inside sidebar */
+.custom-sidebar-title {
+  font-style: italic;
+  font-size: 0.8rem;
+  font-weight: 300;
+  margin-bottom: 0;
+  color: #333;
+}
+
+.panel-tabset .nav-item {
+  font-weight: 500;
+
+}
+
+.panel-tabset .nav-link {
+  color: #333333;           /* Change label text color */
+  font-weight: 500;        /* Make labels bold */
+  background-color: #eeeeee;  /* Change tab background */
+}
+
+/* Style the active or selected tab */
+.panel-tabset .nav-link.active {
+  font-weight: 500;
+  color:#ffffff;           /* Active text color */
+  background-color:#0097d6;/* Active background color */
+}
+
+
+a {
+  color: #0097d6;
+  text-decoration: none;
+}
