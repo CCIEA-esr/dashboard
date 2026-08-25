@@ -6,11 +6,10 @@
     on:
       push:
         branches: main
-#    on:
-#      workflow_dispatch:
-#      schedule:
+      workflow_dispatch:
+      schedule:
       # update every day at 12 pm UTC = 5 am PDT
-#        - cron: '0 12 * * *'
+        - cron: '0 12 * * *'
     permissions:
       contents: write  # Allows the token to push HTML to the gh-pages branch
 
@@ -36,8 +35,8 @@
                 any::rmarkdown
                 any::knitr
                 
-#           - name: Import data
-#             run: update_dashboard.R
+           - name: Import data
+             run: update_dashboard.R
 
           - name: Set up Quarto
             uses: quarto-dev/quarto-actions/setup@v2
