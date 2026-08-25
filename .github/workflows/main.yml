@@ -11,8 +11,8 @@
 #      schedule:
       # update every day at 12 pm UTC = 5 am PDT
 #        - cron: '0 12 * * *'
-permissions:
-  contents: write  # Allows the token to push HTML to the gh-pages branch
+    permissions:
+      contents: write  # Allows the token to push HTML to the gh-pages branch
 
     jobs:
       build-and-deploy:
