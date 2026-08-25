@@ -37,11 +37,8 @@
 
           - name: Set up Quarto
             uses: quarto-dev/quarto-actions/setup@v2
-            env:
-              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          - name: Install Quarto and render project
-            run: quarto render
+            with:
+              tinytex: false
             env:
               GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -54,8 +51,9 @@
               git commit -m 'Dashboard updated' || echo "No changes to commit"
               git push origin || echo "No changes to commit"
               
-          - name: Deploy to GitHub Pages
-            uses: peaceiris/actions-gh-pages@v3
+          - name: Publish to GitHub Pages (and render)
+            uses: quarto-dev/quarto-actions/publish@v2
             with:
-              github_token: ${{ secrets.GITHUB_TOKEN }}
-              publish_dir: ./docs
+              target: gh-pages
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # this secret is always available for github actions
