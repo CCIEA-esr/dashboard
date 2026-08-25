@@ -46,19 +46,19 @@
 }
 
 .panel-tabset .nav-item {
-  font-weight: 500;
+  font-weight: 600;
 
 }
 
 .panel-tabset .nav-link {
   color: #333333;           /* Change label text color */
-  font-weight: 500;        /* Make labels bold */
+  font-weight: 600;        /* Make labels bold */
   background-color: #eeeeee;  /* Change tab background */
 }
 
 /* Style the active or selected tab */
 .panel-tabset .nav-link.active {
-  font-weight: 500;
+  font-weight: 600;
   color:#ffffff;           /* Active text color */
   background-color:#0097d6;/* Active background color */
 }

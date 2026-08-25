@@ -82,7 +82,7 @@ ojs_define(allGroups = ojs_groups)
 
 ## Dashboard
 
-::::{}
+::::{.border .rounded .border-2 .border-light style="padding-left: 15px;"}
 
 *Jump to:*
 
@@ -131,6 +131,7 @@ html`${allGroups.map((group, groupIdx) => {
       }
       .group-cb-${groupIdx} label:nth-child(${idx + 1}) input[type="checkbox"] {
         accent-color: ${color} !important;
+        color: white;
       }
     `).join("")}
     #legdiv_${groupIdx} {height : ${legdivht} px;}
@@ -216,7 +217,7 @@ html`${allGroups.map((group, groupIdx) => {
 #| echo: false
 #| results: 'asis'
 
-baseurl = "http://oceanview.pfeg.noaa.gov/erddap/tabledap/"
+baseurl = "https://oceanview.pfeg.noaa.gov/erddap/tabledap/"
 
 geturl <- function(dset,fmt,query,baseurl){
   url=paste0(baseurl,dset,".",fmt, sep="")
