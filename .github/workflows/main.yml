@@ -35,8 +35,8 @@
                 any::rmarkdown
                 any::knitr
                 
-           - name: Import data
-             run: update_dashboard.R
+          - name: Import data
+            run: Rscript update_dashboard.R
 
           - name: Set up Quarto
             uses: quarto-dev/quarto-actions/setup@v2
