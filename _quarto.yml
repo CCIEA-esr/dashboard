@@ -10,8 +10,6 @@ website:
     center:
       - text: "Website Owner"
         href: https://www.integratedecosystemassessment.noaa.gov/regions/california-current
-      - text: "Contact"
-        href: https://www.integratedecosystemassessment.noaa.gov/regions/california-current
       - text: "NOAA"
         href: https://www.noaa.gov/
       - text: "Privacy Policy"
