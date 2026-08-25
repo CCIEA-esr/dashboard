@@ -1,7 +1,7 @@
 library(jsonlite)
 
 # Read CSV and load data into matrix/data frame structure
-csv_raw <- read.csv("indicators.csv", header = FALSE, stringsAsFactors = FALSE)
+csv_raw <- read.csv("data/indicators.csv", header = FALSE, stringsAsFactors = FALSE)
 labels <- unlist(csv_raw[1, -1])  # Exclude first element ("group")
 data_rows <- csv_raw[-1, ]
 
@@ -235,4 +235,4 @@ grouplist <- list(
   items = groupitems
 )
 
-write(toJSON(grouplist, auto_unbox = TRUE, pretty = TRUE, null = "null"), file = "items_dashboard.json")
+write(toJSON(grouplist, auto_unbox = TRUE, pretty = TRUE, null = "null"), file = "data/items_dashboard.json")
