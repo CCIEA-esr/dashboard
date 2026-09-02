@@ -1,60 +1,109 @@
-# Github Actions to read CCIEA Google Drive and update Uploader Status table
-# Need to grant read/write permissions for Action to do the commits
-# Settings -> Actions -> General -> Workflow permissions
-    name: Deploy CCIEA Dashboard
-# Use the following to update on push
-    on:
-      push:
-        branches: main
-      workflow_dispatch:
-      schedule:
-      # update every day at 12 pm UTC = 5 am PDT
-        - cron: '0 12 * * *'
-    permissions:
-      contents: write  # Allows the token to push HTML to the gh-pages branch
+name: Deploy CCIEA Dashboard
 
-    jobs:
-      build-and-deploy:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Check out repository
-            uses: actions/checkout@v4
-            # Important: set fetch-depth to 0 so the action can push back to the repo
- #           with:
-#              fetch-depth: 0
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    # update every day at 12 pm UTC = 5 am PDT
+    - cron: '0 12 * * *'
 
-          - name: Set up R
-            uses: r-lib/actions/setup-r@v2
-              
-          - name: Install packages
-            uses: r-lib/actions/setup-r-dependencies@v2
-            with:
-              cache: always
-              packages: |
-                any::tidyverse
-                any::rmarkdown
-                any::knitr
-                
-          - name: Import data
-            run: Rscript update_dashboard.R
+permissions:
+  contents: write  # Allows the token to push
 
-          - name: Set up Quarto
-            uses: quarto-dev/quarto-actions/setup@v2
-            with:
-              tinytex: false
+concurrency:
+  group: deploy-dashboard-${{ github.ref }}
+  cancel-in-progress: true
 
-          - name: Commit results
-            run: |
-              git config --local user.email "actions@github.com"
-              git config --local user.name "GitHub Actions"
-              git add data/items_dashboard.json
-              git add data/indicators.csv
-              git commit -m 'Dashboard updated' || echo "No changes to commit"
-              git push origin || echo "No changes to commit"
-              
-          - name: Publish to GitHub Pages (and render)
-            uses: quarto-dev/quarto-actions/publish@v2
-            with:
-              target: gh-pages
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # this secret is always available for github actions
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      QUARTO_VERSION: '1.3.441'   # bump to invalidate Quarto cache
+      R_LIBS_USER: ${{ github.workspace }}/R/library
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0            # needed to be able to push commits
+          persist-credentials: true # use GITHUB_TOKEN for git push/auth
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+      - name: Restore Quarto cache
+        id: cache-quarto
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/quarto
+            ~/.quarto
+          key: ${{ runner.os }}-quarto-${{ env.QUARTO_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-quarto-
+
+    # If cache hit, make sure Quarto is available on PATH
+      - name: Add cached Quarto to PATH (if present)
+      if: steps.cache-quarto.outputs.cache-hit == 'true'
+      run: |
+        if [ -d /opt/quarto ]; then
+          echo "/opt/quarto/bin" >> $GITHUB_PATH
+        elif [ -d "$HOME/.quarto/bin" ]; then
+          echo "$HOME/.quarto/bin" >> $GITHUB_PATH
+        else
+          echo "Quarto cache claimed a hit but no expected dir found; continuing to setup step."
+        fi
+
+  # Only run the official setup action when we missed the cache
+      - name: Install Quarto (cache miss)
+        if: steps.cache-quarto.outputs.cache-hit != 'true'
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: ${{ env.QUARTO_VERSION }}
+          tinytex: false
+
+      - name: Verify Quarto
+        run: |
+          quarto --version
+
+  # Example: cache R library to speed dependency installs
+      - name: Restore R package cache
+        id: cache-r
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ hashFiles('**/renv.lock', '**/DESCRIPTION') }}
+          restore-keys: |
+            ${{ runner.os }}-r-
+
+      - name: Setup R and install deps
+        run: |
+          mkdir -p "${R_LIBS_USER}"
+          Rscript -e 'if (!requireNamespace("remotes", quietly=TRUE)) install.packages("remotes", repos="https://cloud.r-project.org")'
+          Rscript -e 'remotes::install_deps(dependencies = TRUE, repos="https://cloud.r-project.org")'
+      
+      - name: Import data
+        run: Rscript update_dashboard.R
+
+      - name: Commit results (if any)
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          # Stage changes (both modifications, additions and deletions)
+          git add -A
+          # Only commit if there are staged changes
+          if ! git diff --cached --quiet; then
+            git commit -m 'Dashboard updated'
+            # Push to the same branch the workflow was triggered on
+            git push origin "HEAD:${{ github.ref_name }}" 
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Publish to GitHub Pages (and render)
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
