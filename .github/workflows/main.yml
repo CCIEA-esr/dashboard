@@ -10,7 +10,7 @@ on:
     - cron: '0 12 * * *'
 
 permissions:
-  contents: write  # Allows the token to push
+  contents: write # Allows the token to push
 
 concurrency:
   group: deploy-dashboard-${{ github.ref }}
@@ -20,53 +20,33 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      QUARTO_VERSION: '1.3.441'   # bump to invalidate Quarto cache
+      QUARTO_VERSION: '1.3.441'
       R_LIBS_USER: ${{ github.workspace }}/R/library
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0            # needed to be able to push commits
-          persist-credentials: true # use GITHUB_TOKEN for git push/auth
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
-      - name: Restore Quarto cache
-        id: cache-quarto
-        uses: actions/cache@v4
-        with:
-          path: |
-            /opt/quarto
-            ~/.quarto
-          key: ${{ runner.os }}-quarto-${{ env.QUARTO_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-quarto-
 
-    # If cache hit, make sure Quarto is available on PATH
-      - name: Add cached Quarto to PATH (if present)
-      if: steps.cache-quarto.outputs.cache-hit == 'true'
-      run: |
-        if [ -d /opt/quarto ]; then
-          echo "/opt/quarto/bin" >> $GITHUB_PATH
-        elif [ -d "$HOME/.quarto/bin" ]; then
-          echo "$HOME/.quarto/bin" >> $GITHUB_PATH
-        else
-          echo "Quarto cache claimed a hit but no expected dir found; continuing to setup step."
-        fi
-
-  # Only run the official setup action when we missed the cache
-      - name: Install Quarto (cache miss)
-        if: steps.cache-quarto.outputs.cache-hit != 'true'
+      - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: ${{ env.QUARTO_VERSION }}
           tinytex: false
 
       - name: Verify Quarto
-        run: |
-          quarto --version
+        run: quarto --version
 
-  # Example: cache R library to speed dependency installs
+      - name: Configure R Library Directory
+        run: |
+          mkdir -p "${R_LIBS_USER}"
+          echo "R_LIBS_USER=${R_LIBS_USER}" >> ~/.Renviron
+
       - name: Restore R package cache
         id: cache-r
         uses: actions/cache@v4
@@ -76,12 +56,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-
 
-      - name: Setup R and install deps
+      - name: Install R deps
         run: |
-          mkdir -p "${R_LIBS_USER}"
           Rscript -e 'if (!requireNamespace("remotes", quietly=TRUE)) install.packages("remotes", repos="https://cloud.r-project.org")'
           Rscript -e 'remotes::install_deps(dependencies = TRUE, repos="https://cloud.r-project.org")'
-      
+
       - name: Import data
         run: Rscript update_dashboard.R
 
@@ -89,12 +68,9 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          # Stage changes (both modifications, additions and deletions)
           git add -A
-          # Only commit if there are staged changes
           if ! git diff --cached --quiet; then
             git commit -m 'Dashboard updated'
-            # Push to the same branch the workflow was triggered on
             git push origin "HEAD:${{ github.ref_name }}" 
           else
             echo "No changes to commit"
@@ -106,4 +82,4 @@ jobs:
           target: gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+          
