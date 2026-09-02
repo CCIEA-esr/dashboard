@@ -35,7 +35,7 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
-          version: ${{ env.QUARTO_VERSION }}
+          version: 'release'
           tinytex: false
 
       - name: Verify Quarto
@@ -70,7 +70,7 @@ jobs:
           git add -A
           if ! git diff --cached --quiet; then
             git commit -m 'Dashboard updated'
-            git push origin "HEAD:${{ github.ref_name }}" 
+            git push origin "HEAD:${{ github.ref_name }}"
           else
             echo "No changes to commit"
           fi
