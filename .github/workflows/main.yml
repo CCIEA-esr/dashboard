@@ -38,10 +38,6 @@ jobs:
             any::knitr
       - name: Import data
         run: Rscript update_dashboard.R
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-        with:
-          tinytex: false
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
@@ -50,6 +46,10 @@ jobs:
           git add data/indicators.csv
           git commit -m 'Dashboard updated' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          tinytex: false
       - name: Publish to GitHub Pages (and render)
         uses: quarto-dev/quarto-actions/publish@v2
         with:
