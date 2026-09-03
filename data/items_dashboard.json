@@ -29,7 +29,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv0",
-        "dateWindow": [1630769621162.7046, 1788449621162.7046],
+        "dateWindow": [1630774713647.7458, 1788454713647.7458],
         "width": "700",
         "height": "300"
       },
@@ -7707,7 +7707,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv1",
-        "dateWindow": [1630769628819.8811, 1788449628819.8811],
+        "dateWindow": [1630774723265.5576, 1788454723265.5576],
         "width": "700",
         "height": "300"
       },
@@ -16419,7 +16419,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv2",
-        "dateWindow": [1780673632603.896, 1788449632603.896],
+        "dateWindow": [1780678727542.5107, 1788454727542.5107],
         "width": "700",
         "height": "300"
       },
@@ -17008,7 +17008,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv3",
-        "dateWindow": [1630769638339.6296, 1788449638339.6296],
+        "dateWindow": [1630774733829.283, 1788454733829.283],
         "width": "700",
         "height": "300"
       },
@@ -21008,7 +21008,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv4",
-        "dateWindow": [1630769670693.7065, 1788449670693.7065],
+        "dateWindow": [1630774766979.364, 1788454766979.364],
         "width": "700",
         "height": "300"
       },
