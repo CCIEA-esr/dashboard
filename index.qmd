@@ -2,6 +2,7 @@
 format:
   html:
     page-layout: full
+    number-sections: true
     toc: false
     css: lib/dygraph/dygraph.min.css
     include-in-header:
@@ -86,11 +87,11 @@ ojs_define(allGroups = ojs_groups)
 
 *Jump to:*
 
-* [Large Scale Oceanographic Indicators](index.qmd#grp0){target="_self"}
-* [Upwelling Index - Monthly](index.qmd#grp1){target="_self"}
-* [Upwelling Index - Daily](index.qmd#grp2){target="_self"}
-* [Habitat Compression](index.qmd#grp3){target="_self"}
-* [Marine Heat Wave](index.qmd#grp4){target="_self"}
+* [Large Scale Oceanographic Indicators](#sec-large-scale-oceanographic-indicators)
+* [Upwelling Index - Monthly](#sec-upwelling-index)
+* [Upwelling Index - Daily](#sec-upwelling-index-daily)
+* [Habitat Compression](#sec-habitat-compression)
+* [Marine Heat Wave](#sec-marine-heat-wave)
 
 ::::
 
@@ -189,6 +190,8 @@ html`${allGroups.map((group, groupIdx) => {
       chartContainer._dygraphInstance.resize();
     }, 50);
   });
+  
+  const sectionSlug = group.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   return html`
     ${dynamicStyles}
@@ -198,7 +201,7 @@ html`${allGroups.map((group, groupIdx) => {
       ${checkboxInputs}
       </div>
       <div class="custom-main">
-      <div><h3>${group.title}</h3></div>
+      <div><h3 id="sec-${sectionSlug}">${group.title}</h3></div>
       <div id="legdiv_${group.index}"></div>
       ${chartContainer}
       </div>
