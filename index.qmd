@@ -167,6 +167,7 @@ html`${allGroups.map((group, groupIdx) => {
     
     chartContainer._dygraphInstance = new Dygraph(chartContainer, chartData, {
       labels: ["Time", ...group.labels],
+      labelsUTC: true,
       colors: group.colors,
       visibility: initialVisibility,
       ylabel: group.ylabel || "",
