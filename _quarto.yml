@@ -46,6 +46,7 @@ format:
       sidebar-width: 150px
     link-external-newwindow: true
     link-external-icon: true
+    link-external-filter: '^(?:http:|https:)\/\/localhost|^\.' 
 
 
 

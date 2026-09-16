@@ -201,7 +201,7 @@ html`${allGroups.map((group, groupIdx) => {
       ${checkboxInputs}
       </div>
       <div class="custom-main">
-      <div><h3 id="sec-${sectionSlug}">${group.title}</h3></div>
+      <div><h3 id="${sectionSlug}">${group.title}</h3></div>
       <div id="legdiv_${group.index}"></div>
       ${chartContainer}
       </div>
