@@ -2,7 +2,7 @@
 format:
   html:
     page-layout: full
-    number-sections: true
+    number-sections: false
     toc: false
     css: lib/dygraph/dygraph.min.css
     include-in-header:
@@ -215,6 +215,18 @@ html`${allGroups.map((group, groupIdx) => {
 
 ## Indicator Information & Download
 
+::::{.border .rounded .border-2 .border-light style="padding-left: 15px;"}
+
+*Jump to:*
+
+* [Large Scale Oceanographic Indicators](#info-large-scale-oceanographic-indicators)
+* [Upwelling Index - Monthly](#info-upwelling-index)
+* [Habitat Compression](#info-habitat-compression)
+* [Marine Heat Wave](#info-marine-heat-wave)
+
+::::
+
+
 
 ```{r}
 #| echo: false
@@ -242,7 +254,11 @@ for (group in json_data$items) {
       }
     if(group$title=="Upwelling Index - Daily")break
     ningr=ningr+1
-    if(ningr == 1)cat("### ",group$title, "\n\n",sep="")
+    group_title <- gsub("[^a-z0-9]+", "-", tolower(group$title))
+    if(ningr == 1){
+      cat('<div style="padding: 15px; background: #ffffff; border: 1px solid #e9ecef; border-radius: 6px; margin-bottom: 25px;">',sep="")
+      cat('<div><h3 id="info-',group_title,'">',group$title,'</h3></div>',sep="")
+    }
     clean_desc <- gsub("<[^>]+>", "", group$summary[[i]])
       title = indtitle
       description = trimws(clean_desc)
@@ -255,8 +271,8 @@ for (group in json_data$items) {
     cat(description,"\n\n",sep="")
     cat("*Institution*: ",institution,"\n\n",sep="")
     cat("*Time Range:* ", trange,"\n\n",sep="")
-    cat("*Download:*&nbsp;&nbsp;&nbsp;  [csv file](",csv,")&nbsp;&nbsp;&nbsp;","[Go to ERDDAP&#8482;](", html,")\n\n" ,sep="") 
-   }
+    cat("*Download:*&nbsp;&nbsp;&nbsp;  [csv file](",csv,")&nbsp;&nbsp;&nbsp;","[Go to ERDDAP&#8482;](", html,")\n\n" ,sep="")    }
+    cat("</div>")
 }
 
 ```
