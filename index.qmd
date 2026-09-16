@@ -135,7 +135,7 @@ html`${allGroups.map((group, groupIdx) => {
         color: white;
       }
     `).join("")}
-    #legdiv_${groupIdx} {height : ${legdivht} px;}
+    #legdiv_${groupIdx} {height : ${legdivht}px;}
   </style>`;
 
   const chartContainer = document.createElement("div");
@@ -221,7 +221,7 @@ html`${allGroups.map((group, groupIdx) => {
 *Jump to:*
 
 * [Large Scale Oceanographic Indicators](#info-large-scale-oceanographic-indicators)
-* [Upwelling Index - Monthly](#info-upwelling-index)
+* [Upwelling Index](#info-upwelling-index)
 * [Habitat Compression](#info-habitat-compression)
 * [Marine Heat Wave](#info-marine-heat-wave)
 
@@ -235,48 +235,56 @@ html`${allGroups.map((group, groupIdx) => {
 
 baseurl = "https://oceanview.pfeg.noaa.gov/erddap/tabledap/"
 
-geturl <- function(dset,fmt,query,baseurl){
-  url=paste0(baseurl,dset,".",fmt, sep="")
-  if(exists(query) && !is.null(query))paste0(url,"?&",query,sep="")
+geturl <- function(dset, fmt, query, baseurl){
+  url = paste0(baseurl, dset, ".", fmt, sep="")
+  if (exists("query") && !is.null(query)) paste0(url, "?&", query, sep="")
   return(url)
 }
 
 for (group in json_data$items) {
-  ningr = 0
+  # Skip groups that shouldn't render information blocks
+  if (group$title == "Upwelling Index - Daily") next
+  
+  # Generate a clean ID for the anchor link
+  group_title <- gsub("[^a-z0-9]+", "-", tolower(group$title))
+  
+  # Open the outer container
+  cat('\n<div style="padding: 15px; background: #ffffff; border: 1px solid #e9ecef; border-radius: 6px; margin-bottom: 25px;">\n')
+  cat('<div><h3 id="info-', group_title, '">', group$title, '</h3></div>\n\n', sep="")
+  
+  # Render each indicator inside the group
   for (i in seq_along(group$titles)) {
     indtitle <- group$titles[[i]]
-    if(group$title=="Upwelling Index"){
-      if(i>3)break
-      indtitle <- substr(indtitle,1,nchar(indtitle)-5)
-      }
-    if(group$title=="Habitat Compression"){
-      if(i>1)break
-      indtitle <- substr(indtitle,1,nchar(indtitle)-9)
-      }
-    if(group$title=="Upwelling Index - Daily")break
-    ningr=ningr+1
-    group_title <- gsub("[^a-z0-9]+", "-", tolower(group$title))
-    if(ningr == 1){
-      cat('<div style="padding: 15px; background: #ffffff; border: 1px solid #e9ecef; border-radius: 6px; margin-bottom: 25px;">',sep="")
-      cat('<div><h3 id="info-',group_title,'">',group$title,'</h3></div>',sep="")
-    }
-    clean_desc <- gsub("<[^>]+>", "", group$summary[[i]])
-      title = indtitle
-      description = trimws(clean_desc)
-      institution = group$inst[[i]]
-      trange = paste0(substr(group$minT[[i]],1,10)," - ",substr(group$maxT[[i]],1,10),sep="")
-    csv = geturl(group$dsets[[i]],'csv',group$query[[i]],baseurl)
-    html = geturl(group$dsets[[i]],'html',group$query[[i]],baseurl)
     
-    cat("#### **",title,"**\n",sep="")
-    cat(description,"\n\n",sep="")
-    cat("*Institution*: ",institution,"\n\n",sep="")
-    cat("*Time Range:* ", trange,"\n\n",sep="")
-    cat("*Download:*&nbsp;&nbsp;&nbsp;  [csv file](",csv,")&nbsp;&nbsp;&nbsp;","[Go to ERDDAP&#8482;](", html,")\n\n" ,sep="")    }
-    cat("</div>")
-}
+    if (group$title == "Upwelling Index") {
+      if (i > 3) break
+      indtitle <- substr(indtitle, 1, nchar(indtitle) - 5)
+    }
+    if (group$title == "Habitat Compression") {
+      if (i > 1) break
+      indtitle <- substr(indtitle, 1, nchar(indtitle) - 9)
+    }
+    
+    clean_desc  <- gsub("<[^>]+>", "", group$summary[[i]])
+    title       <- indtitle
+    description <- trimws(clean_desc)
+    institution <- group$inst[[i]]
+    trange      <- paste0(substr(group$minT[[i]], 1, 10), " - ", substr(group$maxT[[i]], 1, 10))
+    csv         <- geturl(group$dsets[[i]], 'csv', group$query[[i]], baseurl)
+    html        <- geturl(group$dsets[[i]], 'html', group$query[[i]], baseurl)
+    
+    # Using pure HTML <h4> instead of #### stops Quarto from breaking the parent tabset
+    cat("<h4><strong>", title, "</strong></h4>\n", sep="")
+    cat("<p>", description, "</p>\n\n", sep="")
+    cat("<p><em>Institution</em>: ", institution, "</p>\n\n", sep="")
+    cat("<p><em>Time Range:</em> ", trange, "</p>\n\n", sep="")
+    cat("<p><em>Download:</em>&nbsp;&nbsp;&nbsp; [csv file](", csv, ")&nbsp;&nbsp;&nbsp;", "[Go to ERDDAP&#8482;](", html, ")</p>\n\n", sep="")
+  }
 
+  cat('</div>\n\n')
+}
 ```
 
 
 :::
+
