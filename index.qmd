@@ -87,11 +87,11 @@ ojs_define(allGroups = ojs_groups)
 
 *Jump to:*
 
-* [Large Scale Oceanographic Indicators](#sec-large-scale-oceanographic-indicators)
-* [Upwelling Index - Monthly](#sec-upwelling-index)
-* [Upwelling Index - Daily](#sec-upwelling-index-daily)
-* [Habitat Compression](#sec-habitat-compression)
-* [Marine Heat Wave](#sec-marine-heat-wave)
+* [Large Scale Oceanographic Indicators](#large-scale-oceanographic-indicators)
+* [Upwelling Index - Monthly](#upwelling-index)
+* [Upwelling Index - Daily](#upwelling-index-daily)
+* [Habitat Compression](#habitat-compression)
+* [Marine Heat Wave](#marine-heat-wave)
 
 ::::
 
