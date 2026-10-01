@@ -29,7 +29,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv0",
-        "dateWindow": [1633108864559.0474, 1790788864559.0474],
+        "dateWindow": [1633197248765.9575, 1790877248765.9575],
         "width": "700",
         "height": "300"
       },
@@ -7715,7 +7715,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv1",
-        "dateWindow": [1633108872308.6052, 1790788872308.6052],
+        "dateWindow": [1633197256042.0359, 1790877256042.0359],
         "width": "700",
         "height": "300"
       },
@@ -16427,7 +16427,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv2",
-        "dateWindow": [1783012876353.9211, 1790788876353.9211],
+        "dateWindow": [1783101259813.8618, 1790877259813.8618],
         "width": "700",
         "height": "300"
       },
@@ -16472,12 +16472,6 @@
         "m^3/s/100m coastline"
       ],
       "data": [
-        [
-          "2026-07-03T00:00:00Z",
-          "10.544354",
-          "178.00523",
-          "160.13393"
-        ],
         [
           "2026-07-04T00:00:00Z",
           "37.601517",
@@ -17016,7 +17010,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv3",
-        "dateWindow": [1633108881593.9595, 1790788881593.9595],
+        "dateWindow": [1633197264648.6299, 1790877264648.6299],
         "width": "700",
         "height": "300"
       },
@@ -21023,7 +21017,7 @@
         "showRangeSelector": "true",
         "connectSeparatedPoints": "true",
         "labelsDiv": "legdiv4",
-        "dateWindow": [1633108908357.2139, 1790788908357.2139],
+        "dateWindow": [1633197290063.6096, 1790877290063.6096],
         "width": "700",
         "height": "300"
       },
