@@ -10,3 +10,4 @@ docs/
 /.secrets/
 /_extensions/
 
+*.tmp
