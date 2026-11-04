@@ -46,7 +46,7 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add data/items_dashboard.json
           git add data/indicators.csv
-          git add images/aily_upwell.png
+          git add images/daily_upwell.png
           git commit -m 'Dashboard updated' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
       - name: Set up Quarto
