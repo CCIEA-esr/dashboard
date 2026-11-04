@@ -38,12 +38,15 @@ jobs:
             any::knitr
       - name: Import data
         run: Rscript update_dashboard.R
+      - name: Plot daily upwell
+        run: Rscript plot_daily_upwelling.R
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add data/items_dashboard.json
           git add data/indicators.csv
+          git add images/aily_upwell.png
           git commit -m 'Dashboard updated' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
       - name: Set up Quarto
